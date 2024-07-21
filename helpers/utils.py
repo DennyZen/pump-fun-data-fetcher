@@ -1,6 +1,57 @@
 import requests
 import json
 import certifi
+import pprint
+
+def format_numbers(data):
+    if isinstance(data, dict):
+        return {k: format_numbers(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [format_numbers(v) for v in data]
+    elif isinstance(data, float) or isinstance(data, int):
+        return f"{data:,}"
+    else:
+        return data
+def print_json(data, indent=2):
+    """
+    Рекурсивная функция для поочередного вывода ключей и значений JSON-переменной.
+    
+    :param data: Данные для анализа
+    :param indent: Уровень отступа (используется для вложенных структур)
+    """
+    spacing = ' ' * indent
+    if isinstance(data, dict):
+        for key, value in data.items():
+            print(f'{spacing}{key}: ', end='')
+            print_json(value, indent + 4)
+    elif isinstance(data, list): print(f'list of {len(data)}', end='')
+        # for i, item in enumerate(data):
+        #     print(f'{spacing}[{i}]: ', end='')
+        #     print_json(item, indent + 4)
+    else:
+        print(f'{spacing}{data}')
+def print_structure(data, indent=0):
+    """
+    Рекурсивная функция для вывода структуры данных.
+    
+    :param data: Данные для анализа
+    :param indent: Уровень отступа (используется для вложенных структур)
+    """
+    spacing = ' ' * indent
+    if isinstance(data, dict):
+        print(f'{spacing}')
+        for key, value in data.items():
+            print(f'{spacing}  {key}: ', end='')
+            print_structure(value, indent + 4)
+        print(f'{spacing}')
+    elif isinstance(data, list):
+        print(f'{spacing}[')
+        if data:
+            print_structure(data[0], indent + 4)
+        print(f'{spacing}] (list of {len(data)} elements)')
+    else:
+        print(f'{spacing}{type(data).__name__}')
+
 
 
 def get_holder_account_owner(holder_account):
@@ -38,6 +89,15 @@ def get_token_holder_count(token_address):
     }
     response = requests.post(url, headers=headers, data=json.dumps(body),  verify=certifi.where())
     data = response.json()
+    print(f'get_token_holders_count: ')
+    print_structure(data)
+    #print_json(data)
+    pprint.pprint(data)
+    res = format_numbers(data['result']['token_accounts'])
+
+    pprint.pprint(res[:10])
+
+    
     total_holders = data['result']["total"]
     return total_holders
 
@@ -56,6 +116,13 @@ def get_solana_top_token_holders(token_address, supply):
     response = requests.post(url, headers=headers, data=json.dumps(data),  verify=certifi.where())
 
     data = response.json()
+    
+    print(f'get_solana_top_token_holders - request to twilight-chaotic-lake.solana-mainnet.quiknode.pro')
+    #print_structure(data)
+    res = data['result']['value']
+    res = format_numbers(res)
+    print(f' We got list of {len(res)}  ')
+    pprint.pprint([(acc['address'], acc['uiAmount']) for acc in res])
     
 
     top_five_holders_percentage = []
