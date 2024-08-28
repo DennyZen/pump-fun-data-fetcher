@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import json
 
-from google_sheets import write_to_google_sheets
+from google_sheets import write_to_google_sheets, merge_cells, resize_row, big_last_row
 
 wallet_addresses = [
     "DS2KkjMazkU5rN6E2KMMzTS5ct8aQVP2ruBf57K4c1FF",
@@ -38,9 +38,22 @@ async def subscribe(payload):
     async with websockets.connect(uri) as websocket:
         await websocket.send(json.dumps(payload))
         
+        
         async for message in websocket:
             dict = json.loads(message)
             print(dict)
+
+
+
+            if payload.get('method')=='subscribeAccountTrade' and dict.get('message')=='Successfully subscribed to keys.':
+                big_last_row()
+                msg = 'subscribed to Wallets: '+str(wallet_addresses)
+                print(msg)
+                write_to_google_sheets([[msg]])   #  [['value2','value1']]
+            if dict.get('signature') is not None:
+                msg = [dict['mint'], dict['txType'], dict['tokenAmount'], dict['newTokenBalance'], dict['marketCapSol']]
+                print(msg)
+                write_to_google_sheets([msg])   #  [['value2','value1']]
             if 'name' in dict:
                 print(f'message1 {dict["name"]} {dict["marketCapSol"]} ')
                 write_to_google_sheets([[dict["marketCapSol"],dict["name"]]])
