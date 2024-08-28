@@ -47,7 +47,7 @@ async def subscribe(payload):
 
             if payload.get('method')=='subscribeAccountTrade' and dict.get('message')=='Successfully subscribed to keys.':
                 big_last_row()
-                msg = 'subscribed to Wallets: '+str(wallet_addresses)
+                msg = 'subscribed to Wallets: '+', '.join(wallet_addresses)
                 print(msg)
                 write_to_google_sheets([[msg]])   #  [['value2','value1']]
             if dict.get('signature') is not None:

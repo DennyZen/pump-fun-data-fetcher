@@ -1,6 +1,6 @@
 
 from dotenv import load_dotenv
-
+from datetime import datetime
 import os
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -118,14 +118,18 @@ def big_last_row(list_name='Follow'):
     # Определяем следующую пустую строку
     line_num = len(values) + 1
 
-    merge_cells(line_num-1, line_num, 0, 8)
+    merge_cells(line_num-1, line_num, 1, 8)
     resize_row(line_num-1, line_num, 80)
 def write_to_google_sheets(data, cell=None, list_name='Follow'):
+    formatted_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #data = [formatted_now]+data
+    print(data)
+    data = [[formatted_now]+data[0]]
+    print(data)
     """
     Записывает данные в Google Sheets на указанный лист.
     """
     if not cell:
-
         sheet = _service.spreadsheets()
         
         # Получаем последний заполненный ряд в колонке A
@@ -133,9 +137,7 @@ def write_to_google_sheets(data, cell=None, list_name='Follow'):
         result = sheet.values().get(spreadsheetId=_SAMPLE_SPREADSHEET_ID, range=range_name).execute()
         values = result.get('values', [])
         
-        # Определяем следующую пустую строку
         last_row = len(values) + 1
-
         cell = f"A{last_row}"
     
     # Определяем диапазон для записи данных
