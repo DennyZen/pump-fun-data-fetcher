@@ -4,33 +4,32 @@ import json
 
 from google_sheets import write_to_google_sheets,  big_last_row
 
-wallet_addresses = [
-    "DS2KkjMazkU5rN6E2KMMzTS5ct8aQVP2ruBf57K4c1FF",
-    "4tK7RdcseCvPxAQZiv7iAzyqawedEe16dZb1FZ39zarj",
-    "8TKbC2hE5RwnXUNe2b2a6e5UmRdxPTGS5LX6B2RWAv83",
-    "G5vWA8juZKcEcNBq6noaYC25kNEy1f5NWY9aaBHF8Cno",
-    "AYgZ8C6P11c8iTCj2YyANT9Xok6XUm7iZ7BCeR7fW3XL",
-    "CWvdyvKHEu8Z6QqGraJT3sLPyp9bJfFhoXcxUYRKC8ou",
-    "2RssnB7hcrnBEx55hXMKT1E7gN27g9ecQFbbCc5Zjajq",
-    "DY5Ej41PGDWsDoxMJPbrewTjzyVPLmm5kNL5Bsw3mMVX",
-    "4ADFwrmsrdSVUx8cp7mVtcynvM3hFcdkBZk4vi83KnrA",
-    "4K1QY4aSGveSZ5UUpeG6LP6JsqkSZPvBMo3JD2YTmCCE",
-    "nAxHm1ZmiSbu9kPM4orssuRRUqCJGWE4rzEtYpa5yTp",
-    "GQWLRHtR18vy8myoHkgc9SMcSzwUdBjJ816vehSBwcis",
-    "39PcuE9MBnW4FnqcDJYiy4ppRApdDq4XN4bfksG2nEuP",
-    "BWQMaBZXLTH3RVvRZjwKhQFTahmEtZiSiyWkA94F4oHu",
-    "4PkUrVUp99BwePxDvvgoGVYZM213GyE9VR8Z5235sbVe",
-    "5ePaQ8YreTMQbNoBwiFe6mbvBLBYoGFek3U3pC8TVVsw",
-    "JDZyJqZh6vwqnCeGBXymXPFkMTqDNAGJnm7rz1t6BTnQ",
-    "6bKUguaAgYYbxwvzg7ge4vNTHtrVTmKBSfJRWVvNwAPr",
-    "Ec4BAURantJU6P2yn7HQLxZq9bUo4ZFmc5DAJhVMM1oc",
-    "sEVggxf69nwprkgCPpLMq5i4eAYxYutxCLBiLn5EWRq",
-    "Haq5TB66joFhjKGGSBi6Sdk3Rh9xX4We6wCePGV5uArP",
-    "Bq2RWav5LtfnAs8refzrYjfroDGK9vjYULmTqJX7yXfJ",
-    "5QemTzE4eBsfpN9XjTHmQLVwKjDkdUjcAJKEL4JW9Vgv",
-    "gEwDSjhP1xJFUwiaZDjTNvaTCtKhBjybR2nxPrHzkGc",
-    "H1iBiJj595JhzeQaeudJrfBvMSRKiLNC2NQytrbfW3hU"
-]
+wallet_addresses = ['4ogB5gWF3Vvu4zswi8xpugD8o3Kx2zr7f4fwTTm45oCJ',
+ 'ErAZT2DJ2P57k5hZEqViz6QH1bp2VyRwLRivUwLtHbyz',
+ '7nuD19Drajx9Wb6kbACkNGrzYFQWvXtZCKYMXuXKMfQm',
+ 'zCwNoMuezdDaRVQyk6xdj7eKmVCEq7TBBmM4zXPnALy',
+ 'EE32cTEqdA4JnJhdWkszxxcWZ45QgkD2kxhSW5Vk9aje',
+ 'AGzev4whXDRoAEw2znVZMpjUGf54xhXZK8mHt8jQFNZ6',
+ 'nSt55VVPLRcfSWrMK1tv3mGzyZNJUd7UXdLtb6BhAPS',
+ 'B6wjb9ozqGSTbPMyE2nPvRWY19gPhBsxpFtEqtJcUq1o',
+ '2au2qqN81edcz97UMWhzribhsrDdVbrM2ohgDQuNaXup',
+ 'ES9FLeYDoXi29bNKQPYRQCMGfqCRxizUjfdRNyTnmX5T',
+ '9Woc9XJG48wtbSwGHusDthPeoZ7cbCWTN8pRu8esqWjQ',
+ 'JmH3rty1oEqdSDNUZeTZo9hkiyBKC6FiuwpqAYefPhd',
+ 'AK9M1g73tuAgn62USNTx84ZJ5U28itkf6pK7pMy9VN4j',
+ 'qDXUuA1QFbREvcTWCqU6tW3tuVUZVCfieWnA315L3eq',
+ '2WXMqANBCWQhkPft6YSiYy9XnL3xbkcxmBfhHDrYxJPY',
+ 'B8kepswMFC6k6HjTe2waYNAufyg5Rtd1KX5srQLjxNpZ',
+ 'c7Mf9wuparv5G8vrZbrLxh7Mb9CdEsqRgeMWcK7wobb',
+ 'EkcUBPy95pcwkXxP8z5U4JuP8ydiFfBWYXkLsS22V4o7',
+ '84PP1y9kXp15dd2JAVATQeb4sbgt7Vcv7gstrm2EMrEK',
+ 'HypXUZvd9g7i9qgvTpFNQD541Re4n38AJ5VnjPXu6eUe',
+ '2HAvBvM2Rzr9ztrxBnTStkm3c3Ntwgniw8S1UyEumtru',
+ '5f4kiYGjpV4TdbMLiENGcGV6AnJTQkoDrvcoLGoLrQRE',
+ 'Cve9cywd1xdjYGfttwZCQsfhCe9hDZSsXUGw1UNPeMyz',
+ 'CiboWjN7Sq38EBN9rD4RXQHvury6kdH9osg3kpdWxWef',
+ 'Aecs9UhSV6R1uxz52RszH3yobXGLu64px4PLMpCBqHU2']
+
 wallet_addresses+=['4mH6ENXnLCLf98BCz5BVHfUHDvV6c4wKeDLjAoMxu5Ja','F46fkvycu8cRRB7Z2pnkkCug7a2m1crSBGdjPoCsHvNA', 'A719nD9SkNrG2EQP6CLQFURVKcqfqrT6AJSN3MnR6HSB']
 # From Ray Wallet tracker
 CA = '5FMjMuiAdgwF3REQogMqrdLRBF9pKs5wfJ9hW71Fpump'
