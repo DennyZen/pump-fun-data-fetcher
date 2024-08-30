@@ -3,3 +3,5 @@ key.json
 token.json
 venv/
 .env
+another.json
+pump-fun-data-fetcher.code-workspace

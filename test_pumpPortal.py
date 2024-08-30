@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import json
 
-from google_sheets import write_to_google_sheets, merge_cells, resize_row, big_last_row
+from google_sheets import write_to_google_sheets,  big_last_row
 
 wallet_addresses = [
     "DS2KkjMazkU5rN6E2KMMzTS5ct8aQVP2ruBf57K4c1FF",
@@ -31,32 +31,44 @@ wallet_addresses = [
     "gEwDSjhP1xJFUwiaZDjTNvaTCtKhBjybR2nxPrHzkGc",
     "H1iBiJj595JhzeQaeudJrfBvMSRKiLNC2NQytrbfW3hU"
 ]
+wallet_addresses+=['4mH6ENXnLCLf98BCz5BVHfUHDvV6c4wKeDLjAoMxu5Ja','F46fkvycu8cRRB7Z2pnkkCug7a2m1crSBGdjPoCsHvNA', 'A719nD9SkNrG2EQP6CLQFURVKcqfqrT6AJSN3MnR6HSB']
+# From Ray Wallet tracker
 CA = '5FMjMuiAdgwF3REQogMqrdLRBF9pKs5wfJ9hW71Fpump'
 
 async def subscribe(payload):
     uri = "wss://pumpportal.fun/api/data"
     async with websockets.connect(uri) as websocket:
-        await websocket.send(json.dumps(payload))
+        if isinstance(payload, list):
+            for item in payload:
+                await websocket.send(json.dumps(item))
+        elif isinstance(payload, dict):
+            await websocket.send(json.dumps(payload))
+        else:
+            raise TypeError("payload must be a list or a msg_dict")
         
         
         async for message in websocket:
-            dict = json.loads(message)
-            print(dict)
+            msg_dict = json.loads(message)
+            print(msg_dict)
 
-
-
-            if payload.get('method')=='subscribeAccountTrade' and dict.get('message')=='Successfully subscribed to keys.':
+            if msg_dict.get('message')=='Successfully subscribed to keys.':
                 big_last_row()
                 msg = 'subscribed to Wallets: '+', '.join(wallet_addresses)
                 print(msg)
                 write_to_google_sheets([[msg]])   #  [['value2','value1']]
-            if dict.get('signature') is not None:
-                msg = [dict['mint'], dict['txType'], dict['tokenAmount'], dict['newTokenBalance'], dict['marketCapSol']]
+            elif msg_dict.get('message')=='Successfully subscribed to token creation events.':
+                big_last_row(list_name='New Coins')
+                msg = 'Successfully subscribed to token creation events:'
+                write_to_google_sheets([[msg]], list_name='New Coins')
+            elif msg_dict.get('txType')=='create':
+                    # {'signature': '23eCp3myeTYDP8kLXX3qPU5kQaNwKp1xVBu5mS6yht2hqzt3Zc3wJYrEJnp3fQPs5KTkgeYE7oicyqSVjpMRFj6F', 'mint': '6MniZfAeRg1RRHCddsYQH9mdxREW22CzezxKM2ukFDfp', 'traderPublicKey': '3mxcUNwJNfRajSPdD3yXsuomHtDUfwQSjB17XethgkVn', 'txType': 'create', 'initialBuy': 56259633.607075, 'bondingCurveKey': 'GhKTK26NQt4uQ7hVePxZjantgQZpa4yNDkqCtoeRSVMA', 'vTokensInBondingCurve': 1016740366.392925, 'vSolInBondingCurve': 31.659999999999993, 'marketCapSol': 31.1387263125194, 'name': 'up', 'symbol': 'up', 'uri': 'https://ipfs.io/ipfs/QmW1uhY2xbToS99GiJxqGS7xuDkx5MRdznE12sRucNL6Jn'}
+                    msg = [msg_dict["name"], msg_dict["symbol"], msg_dict["initialBuy"], msg_dict['marketCapSol']]
+                    #print(f'subscribeNewToken !  {msg}')
+                    write_to_google_sheets([msg], list_name='New Coins')
+            elif msg_dict.get('txType')!='create':
+                msg = [msg_dict['mint'], msg_dict['txType'], msg_dict['tokenAmount'], msg_dict['newTokenBalance'], msg_dict['marketCapSol']]
                 print(msg)
                 write_to_google_sheets([msg])   #  [['value2','value1']]
-            if 'name' in dict:
-                print(f'message1 {dict["name"]} {dict["marketCapSol"]} ')
-                write_to_google_sheets([[dict["marketCapSol"],dict["name"]]])
 
 payload2 = {
             "method": "subscribeNewToken",
@@ -69,5 +81,6 @@ payload3 = {
         "method": "subscribeAccountTrade",
         "keys": wallet_addresses  # array of accounts to watch
     }
+payload = [payload2, payload3]
 
-asyncio.get_event_loop().run_until_complete(subscribe(payload3))
+asyncio.get_event_loop().run_until_complete(subscribe(payload))

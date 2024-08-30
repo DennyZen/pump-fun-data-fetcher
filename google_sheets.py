@@ -35,11 +35,11 @@ _credentials = service_account.Credentials.from_service_account_file(
 # Инициализация сервиса Google Sheets API
 _service = build('sheets', 'v4', credentials=_credentials)
 
-def _get_sheet_id(service, spreadsheet_id, sheet_name):
+def _get_sheet_id(sheet_name):
     """
     Получает идентификатор листа по его имени.
     """
-    sheet_metadata = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+    sheet_metadata = _service.spreadsheets().get(spreadsheetId=_SAMPLE_SPREADSHEET_ID).execute()
     sheets = sheet_metadata.get('sheets', '')
     
     for sheet in sheets:
@@ -47,12 +47,11 @@ def _get_sheet_id(service, spreadsheet_id, sheet_name):
             return sheet['properties']['sheetId']
     
     raise ValueError(f"Лист с именем '{sheet_name}' не найден.")
-
-def merge_cells(start_row, end_row, start_col, end_col):
+def update_and_merge_cells(list_name, start_row, end_row, start_col, end_col, pixel_size, bold=True, font_size=14):
     """
-    Объединяет ячейки на указанном листе.
+    Объединяет ячейки, изменяет высоту строки и применяет форматирование текста (жирный шрифт и увеличение размера шрифта).
     """
-    sheet_id = _get_sheet_id(_service, _SAMPLE_SPREADSHEET_ID, _SHEET_NAME)
+    sheet_id = _get_sheet_id(list_name)
     
     merge_range = {
         "sheetId": sheet_id,
@@ -61,51 +60,42 @@ def merge_cells(start_row, end_row, start_col, end_col):
         "startColumnIndex": start_col,
         "endColumnIndex": end_col
     }
-
-    requests = [{
-        "mergeCells": {
-            "range": merge_range,
-            "mergeType": "MERGE_ALL"
+    
+    requests = [
+        {"mergeCells": {"range": merge_range, "mergeType": "MERGE_ALL"}},
+        {
+            "updateDimensionProperties": {
+                "range": {
+                    "sheetId": sheet_id,
+                    "dimension": "ROWS",
+                    "startIndex": start_row,
+                    "endIndex": end_row
+                },
+                "properties": {"pixelSize": pixel_size},
+                "fields": "pixelSize"
+            }
+        },
+        {
+            "repeatCell": {
+                "range": merge_range,
+                "cell": {
+                    "userEnteredFormat": {
+                        "textFormat": {
+                            "bold": bold,
+                            "fontSize": font_size
+                        }
+                    }
+                },
+                "fields": "userEnteredFormat.textFormat"
+            }
         }
-    }]
+    ]
 
-    body = {
-        'requests': requests
-    }
-    
     response = _service.spreadsheets().batchUpdate(
-        spreadsheetId=_SAMPLE_SPREADSHEET_ID,
-        body=body).execute()
-    
-    print(response)
+        spreadsheetId=_SAMPLE_SPREADSHEET_ID, body={'requests': requests}).execute()
 
-def resize_row(start_row, end_row, pixel_size):
-    sheet_id = _get_sheet_id(_service, _SAMPLE_SPREADSHEET_ID, _SHEET_NAME)
     
-    requests = [{
-        "updateDimensionProperties": {
-            "range": {
-                "sheetId": sheet_id,
-                "dimension": "ROWS",  # Изменение высоты строки
-                "startIndex": start_row,
-                "endIndex": end_row
-            },
-            "properties": {
-                "pixelSize": pixel_size  # Высота в пикселях
-            },
-            "fields": "pixelSize"
-        }
-    }]
-
-    body = {
-        'requests': requests
-    }
-    
-    response = _service.spreadsheets().batchUpdate(
-        spreadsheetId=_SAMPLE_SPREADSHEET_ID,
-        body=body).execute()
-    
-    print(response)
+    print(f"Результат изменения форматирования: {response}")
 
 def big_last_row(list_name='Follow'):
     sheet = _service.spreadsheets()
@@ -117,15 +107,16 @@ def big_last_row(list_name='Follow'):
     
     # Определяем следующую пустую строку
     line_num = len(values) + 1
-
-    merge_cells(line_num-1, line_num, 1, 8)
-    resize_row(line_num-1, line_num, 80)
+    
+    update_and_merge_cells(list_name, line_num-1, line_num, 1, 8, 80, bold=True, font_size=14)
+    #merge_cells(list_name, line_num-1, line_num, 1, 8)
+    #resize_row(list_name, line_num-1, line_num, 80)
 def write_to_google_sheets(data, cell=None, list_name='Follow'):
-    formatted_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    formatted_now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     #data = [formatted_now]+data
-    print(data)
+    #print(data)
     data = [[formatted_now]+data[0]]
-    print(data)
+    #print(data)
     """
     Записывает данные в Google Sheets на указанный лист.
     """
@@ -152,7 +143,7 @@ def write_to_google_sheets(data, cell=None, list_name='Follow'):
         body={"values": data}
     ).execute()
     
-    print(f"Результат обновления: {result}")
+    print(f"Результат обновления: \n {result}")
 def write_to_google_sheets2(data, cell='A1',LIST_NAME='New Coins'):
     creds = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=_SCOPES)
