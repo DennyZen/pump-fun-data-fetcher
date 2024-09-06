@@ -32,7 +32,7 @@ wallet_addresses = ['4ogB5gWF3Vvu4zswi8xpugD8o3Kx2zr7f4fwTTm45oCJ',
 
 wallet_addresses+=['4mH6ENXnLCLf98BCz5BVHfUHDvV6c4wKeDLjAoMxu5Ja','F46fkvycu8cRRB7Z2pnkkCug7a2m1crSBGdjPoCsHvNA', 'A719nD9SkNrG2EQP6CLQFURVKcqfqrT6AJSN3MnR6HSB']
 # From Ray Wallet tracker
-CA = '5FMjMuiAdgwF3REQogMqrdLRBF9pKs5wfJ9hW71Fpump'
+CA = '3Tu6nPNdfvqNobQkMgJDwZe1LBve9sRUDQhssqxWK1hL'  # ORACLE
 
 async def subscribe(payload):
     uri = "wss://pumpportal.fun/api/data"
@@ -51,8 +51,15 @@ async def subscribe(payload):
             print(msg_dict)
 
             if msg_dict.get('message')=='Successfully subscribed to keys.':
-                big_last_row()
-                msg = 'subscribed to Wallets: '+', '.join(wallet_addresses)
+                msg = ""
+
+                # Проход по словарю
+                for key, value in payload.items():
+                    msg += f" {key} : {value}\n"
+
+                #print(f"payload = {payload=}")
+                big_last_row(bold=False, font_size=10)
+                #msg = 'subscribed to Wallets: '+', '.join(wallet_addresses)
                 print(msg)
                 write_to_google_sheets([[msg]])   #  [['value2','value1']]
             elif msg_dict.get('message')=='Successfully subscribed to token creation events.':
@@ -80,6 +87,6 @@ payload3 = {
         "method": "subscribeAccountTrade",
         "keys": wallet_addresses  # array of accounts to watch
     }
-payload = [payload2, payload3]
+# payload = [payload2, payload3]
 
-asyncio.get_event_loop().run_until_complete(subscribe(payload))
+asyncio.get_event_loop().run_until_complete(subscribe(payload3))

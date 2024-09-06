@@ -97,7 +97,7 @@ def update_and_merge_cells(list_name, start_row, end_row, start_col, end_col, pi
     
     print(f"Результат изменения форматирования: {response}")
 
-def big_last_row(list_name='Follow'):
+def big_last_row(list_name='Follow', bold=True, font_size=14):
     sheet = _service.spreadsheets()
         
     # Получаем последний заполненный ряд в колонке A
@@ -108,7 +108,7 @@ def big_last_row(list_name='Follow'):
     # Определяем следующую пустую строку
     line_num = len(values) + 1
     
-    update_and_merge_cells(list_name, line_num-1, line_num, 1, 8, 80, bold=True, font_size=14)
+    update_and_merge_cells(list_name, line_num-1, line_num, 1, 8, 80, bold=bold, font_size=font_size)
     #merge_cells(list_name, line_num-1, line_num, 1, 8)
     #resize_row(list_name, line_num-1, line_num, 80)
 def write_to_google_sheets(data, cell=None, list_name='Follow'):
