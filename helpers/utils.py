@@ -79,7 +79,7 @@ def get_token_holder_count(token_address):
     url = (
         f"https://mainnet.helius-rpc.com/?api-key=f12991da-2b2c-4f83-9f89-d8e7cb47166e"
     )
-    params = {"limit": 1000, "mint": token_address}
+    params = {"limit": 10, "mint": token_address}
     headers = {"Content-Type": "application/json"}
     body = {
         "jsonrpc": "2.0",
@@ -162,3 +162,19 @@ def get_ohlc(pair_address, start_time, end_time, interval):
     open_price = data["data"]["items"][0]["o"]
     high_price = data["data"]["items"][0]["h"]
     return open_price, high_price
+def get_coin_data(mint_str):
+    url = f"https://frontend-api.pump.fun/coins/{mint_str}"
+    headers = {
+        "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0",
+        "Accept": "*/*",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Referer": "https://www.pump.fun/",
+        "Origin": "https://www.pump.fun",
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"get_coin_data ERROR . Could not connect to server {response.json()}")
+        return None
