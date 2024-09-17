@@ -174,7 +174,15 @@ def get_coin_data(mint_str):
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        return response.json()
+        try:
+            data = response.json()
+            print(f"Successfully fetched data from server. Status code: {response.status_code}")
+            return data
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON response: {e}")
+            return None
     else:
-        print(f"get_coin_data ERROR . Could not connect to server {response.json()}")
+        print(f"get_coin_data ERROR . Could not connect to server. Status code: {response.status_code}")
+        print(f"Response headers: {response.headers}")
+        print(f"Response content: {response.content}")
         return None
