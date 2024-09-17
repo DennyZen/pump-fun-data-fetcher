@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
 
   token_id = 31967  # Уникальный ID токена (например, для Solana)
-  token_info = get_token_info_by_id(token_id)
+  token_info = False # get_token_info_by_id(token_id)
   token_name = 'WATER'  # Название токена
   #token_info = get_token_info(token_name)
   #allTimeHighMcap = get_token_all_time_high(token_name)

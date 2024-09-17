@@ -15,7 +15,7 @@ def get_fifteen_minutes_info():
     tokens = [tok]
     for token in tokens:
         #token_launch_date = token["launchDate"]
-        token['contractAddress'] = "B6h248NJkAcBAkaCnji889a26tCiGXGN8cxhEJ4dX391"
+        token['contractAddress'] = "3Tu6nPNdfvqNobQkMgJDwZe1LBve9sRUDQhssqxWK1hL"   # ORACLE
 
         # Check if token has been launched for 15 minutes
         current_time = datetime.now()

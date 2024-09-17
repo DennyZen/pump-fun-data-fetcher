@@ -95,7 +95,7 @@ def update_and_merge_cells(list_name, start_row, end_row, start_col, end_col, pi
         spreadsheetId=_SAMPLE_SPREADSHEET_ID, body={'requests': requests}).execute()
 
     
-    print(f"Результат изменения форматирования: {response}")
+    #print(f"Результат изменения форматирования: {response}")
 
 def big_last_row(list_name='Follow', bold=True, font_size=14):
     sheet = _service.spreadsheets()
@@ -143,7 +143,7 @@ def write_to_google_sheets(data, cell=None, list_name='Follow'):
         body={"values": data}
     ).execute()
     
-    print(f"Результат обновления: \n {result}")
+    #print(f"Результат обновления: \n {result}")
 def write_to_google_sheets2(data, cell='A1',LIST_NAME='New Coins'):
     creds = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=_SCOPES)

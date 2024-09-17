@@ -3,7 +3,7 @@ import websockets
 import json
 
 from google_sheets import write_to_google_sheets,  big_last_row
-
+from helpers.utils import get_coin_data
 wallet_addresses = ['4ogB5gWF3Vvu4zswi8xpugD8o3Kx2zr7f4fwTTm45oCJ',
  'ErAZT2DJ2P57k5hZEqViz6QH1bp2VyRwLRivUwLtHbyz',
  '7nuD19Drajx9Wb6kbACkNGrzYFQWvXtZCKYMXuXKMfQm',
@@ -29,6 +29,15 @@ wallet_addresses = ['4ogB5gWF3Vvu4zswi8xpugD8o3Kx2zr7f4fwTTm45oCJ',
  'Cve9cywd1xdjYGfttwZCQsfhCe9hDZSsXUGw1UNPeMyz',
  'CiboWjN7Sq38EBN9rD4RXQHvury6kdH9osg3kpdWxWef',
  'Aecs9UhSV6R1uxz52RszH3yobXGLu64px4PLMpCBqHU2']
+wallet_addresses = [
+    "3eJkwFDZVB27emciij1oWUVodmFhFdnkpmzKHjDzH34o",
+    "CPUvH6fYkpYBK5raccquTMNJAGc6eQ37VVqBgHq3hwjp",
+    "7Gt57NfrPD82K8YpTsSijPB2tfdob7Hy1nU7C67P1J52",
+    "4uZbWYcAk3Wuw2cyFXK2Cw7Mo38khTz9phC3VD1KXTbX",
+    "BDFMkurHjWM8HCibLRncxaSF8eQ3oJJztPSr4jUEo3nZ",
+    "D4zVhwuUsFbcaty7wJhNEZ7VEwPHXQ5d2heXPxM5yWhL",
+    "A67uuHBkB4MW6GoFYyiymKGKSDYDwvFPNF5XFqSM8q5L"
+]
 
 wallet_addresses+=['4mH6ENXnLCLf98BCz5BVHfUHDvV6c4wKeDLjAoMxu5Ja','F46fkvycu8cRRB7Z2pnkkCug7a2m1crSBGdjPoCsHvNA', 'A719nD9SkNrG2EQP6CLQFURVKcqfqrT6AJSN3MnR6HSB']
 # From Ray Wallet tracker
@@ -72,7 +81,9 @@ async def subscribe(payload):
                     #print(f'subscribeNewToken !  {msg}')
                     write_to_google_sheets([msg], list_name='New Coins')
             elif msg_dict.get('txType')!='create':
-                msg = [msg_dict['mint'], msg_dict['txType'], msg_dict['tokenAmount'], msg_dict['newTokenBalance'], msg_dict['marketCapSol']]
+                coin_data=get_coin_data(msg_dict['mint'])
+                print(json.dumps(coin_data, indent=4))
+                msg = [msg_dict['mint'], msg_dict['txType'], msg_dict['tokenAmount'], msg_dict['newTokenBalance'], msg_dict['marketCapSol'], msg_dict['traderPublicKey'], coin_data.get('symbol','')]
                 print(msg)
                 write_to_google_sheets([msg])   #  [['value2','value1']]
 
