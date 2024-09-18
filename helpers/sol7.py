@@ -6,7 +6,8 @@ from loguru import logger
 from websockets import connect
 import aiosqlite
 from solana.rpc.async_api import AsyncClient
-from solana.publickey import PublicKey
+#from solana.publickey import PublicKey
+from solders.pubkey import Pubkey
 from solana.rpc.types import TxOpts
 
 # Solana WebSocket and RPC endpoints
